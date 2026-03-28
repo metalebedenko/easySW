@@ -1,37 +1,35 @@
 # EasySW
 
-EasySW is a tiny native Windows tray utility that fixes the keyboard layout of the current selection or the word at the caret.
+EasySW — маленькая нативная Windows-утилита в трее, которая исправляет раскладку у выделенного текста или у слова под кареткой.
 
-The app is intentionally small:
+Проект специально сделан легким:
 
-- native Win32 UI
-- no Electron, WebView, .NET desktop runtime, or auto-updater
-- one tray icon, one hotkey setting, one optional startup setting
-- portable `exe` or simple per-user installer
+- чистый Win32 без Electron, WebView и тяжелых рантаймов
+- один tray icon, одна горячая клавиша и опция автозапуска
+- portable `exe` или простой per-user installer
+- предсказуемое поведение без автоисправления “за спиной” пользователя
 
-## Features
+## Возможности
 
-- Runs in the background and lives in the system tray.
-- Fixes the currently selected text with one global hotkey.
-- If nothing is selected, tries to select the word at the caret and fix it.
-- Supports English and Russian layouts via physical key remapping.
-- Stores only:
-  - global hotkey
-  - launch at Windows startup
+- Работает в фоне и живет в системном трее.
+- Исправляет текущий выделенный текст по глобальной горячей клавише.
+- Если выделения нет, пытается выделить и исправить слово под кареткой.
+- Поддерживает английскую и русскую раскладки через посимвольную перекладку клавиш.
+- Хранит только две настройки:
+  - глобальная горячая клавиша
+  - запуск вместе с Windows
 
-## How It Works
+## Как это работает
 
-EasySW uses a layered approach for reliability:
+EasySW использует несколько уровней fallback, чтобы оставаться маленьким, но при этом работать в обычных Windows-приложениях:
 
-1. Try to read the current selection through UI Automation.
-2. If UI Automation is not available, fall back to `Ctrl+C` with clipboard preservation.
-3. If nothing is selected, try to select the word at the caret through UI Automation.
-4. If that also fails, fall back to keyboard selection (`Ctrl+Shift+Left`).
-5. Replace the selected text through clipboard paste, with Unicode input as a last resort.
+1. Сначала пытается прочитать текущее выделение через UI Automation.
+2. Если UI Automation недоступен, пробует стандартный `Ctrl+C` с сохранением clipboard.
+3. Если выделения нет, пытается выбрать слово под кареткой через UI Automation.
+4. Если и это не получилось, использует клавиатурный fallback для выделения предыдущего слова.
+5. Возвращает исправленный текст обратно в активное окно через paste, а в крайнем случае через Unicode input.
 
-This keeps the app lightweight while still working in many common Windows editors and text fields.
-
-## Project Structure
+## Структура проекта
 
 ```text
 .
@@ -52,13 +50,13 @@ This keeps the app lightweight while still working in many common Windows editor
 `-- CMakeLists.txt
 ```
 
-## Build
+## Сборка
 
-### Option 1: Visual Studio / CMake
+### Вариант 1: Visual Studio / CMake
 
-Requirements:
+Требования:
 
-- Visual Studio 2022 or Build Tools with Desktop C++ workload
+- Visual Studio 2022 или Build Tools с Desktop C++ workload
 - CMake 3.21+
 
 ```powershell
@@ -66,51 +64,51 @@ cmake -S . -B build -G "Visual Studio 17 2022" -A x64
 cmake --build build --config Release
 ```
 
-Output:
+Готовый файл:
 
 ```text
 build\Release\EasySW.exe
 ```
 
-### Option 2: LLVM-MinGW helper script
+### Вариант 2: LLVM-MinGW helper script
 
-If you use the same lightweight toolchain as the local build here:
+Если использовать такой же легкий toolchain, как в локальной сборке:
 
 ```powershell
 .\scripts\build-release.ps1
 ```
 
-Output:
+Готовый файл:
 
 ```text
 build\EasySW.exe
 ```
 
-## Installer
+## Установка
 
-An Inno Setup script is included:
+В проекте есть Inno Setup script:
 
 ```text
 packaging\EasySW.iss
 ```
 
-It installs per-user into `%LocalAppData%` and does not require administrator rights.
+Он ставит приложение per-user в `%LocalAppData%` и не требует прав администратора.
 
 ## GitHub Actions
 
-The repository includes a Windows build workflow:
+В репозитории уже есть Windows build workflow:
 
 ```text
 .github\workflows\build.yml
 ```
 
-Every push and pull request builds a Release executable and uploads it as an artifact.
+При каждом push и pull request он собирает Release-версию и прикладывает `EasySW.exe` как artifact.
 
-## Known Limitations
+## Ограничения
 
-- Some applications expose no usable UI Automation text model.
-- Some elevated or protected windows may reject automation and simulated input from a normal user process.
-- Some custom controls ignore standard copy/paste shortcuts.
-- Terminal-like apps and games may require app-specific handling.
+- Некоторые приложения не отдают текст через UI Automation.
+- Некоторые elevated или защищенные окна не принимают automation и simulated input от обычного процесса.
+- Некоторые кастомные контролы игнорируют стандартные copy/paste shortcuts.
+- Терминалы, игры и нестандартные редакторы могут потребовать отдельной адаптации.
 
-For those cases, the app intentionally fails quietly instead of guessing and corrupting text.
+В таких случаях утилита специально предпочитает тихо ничего не сделать, чем пытаться “угадать” и испортить текст.
