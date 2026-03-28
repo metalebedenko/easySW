@@ -1,0 +1,36 @@
+#include "../src/resource.h"
+
+IDI_APP_ICON ICON "app.ico"
+IDR_APP_MANIFEST 24 "app.manifest"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,3,0,0
+ PRODUCTVERSION 0,3,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "EasySW"
+            VALUE "FileDescription", "Keyboard layout fixer for Windows"
+            VALUE "FileVersion", "0.3.0"
+            VALUE "InternalName", "EasySW"
+            VALUE "OriginalFilename", "EasySW.exe"
+            VALUE "ProductName", "EasySW"
+            VALUE "ProductVersion", "0.3.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1200
+    END
+END
